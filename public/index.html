@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kollita Shop - Gestión de Tienda</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #e17055;
+            --dark-bg: #2d3436;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        * { font-family: 'Inter', sans-serif; }
+        body { background: var(--light-bg); }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #2d3436 0%, #1e272e 100%);
+            color: white;
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 0;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .sidebar .nav-link.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .main-content {
+            padding: 2rem;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+        .card:hover { box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1rem 1.25rem;
+        }
+        .btn-primary { background: var(--primary); border: none; }
+        .btn-primary:hover { background: #5a4bd1; }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 0.2rem rgba(108,92,231,0.25);
+        }
+        .table th { font-weight: 600; color: #555; }
+        .status-badge {
+            padding: 0.35em 0.65em;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-disponible { background: #d4edda; color: #155724; }
+        .status-reservado { background: #fff3cd; color: #856404; }
+        .status-vendido { background: #f8d7da; color: #721c24; }
+        .section-hidden { display: none; }
+        .fade-in { animation: fadeIn 0.3s; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin: 0 2px;
+        }
+        .btn-delete { color: var(--danger); }
+        .btn-delete:hover { color: #c0392b; }
+        .btn-edit { color: var(--primary); }
+        .btn-edit:hover { color: #5a4bd1; }
+        .table-responsive { overflow-x: auto; }
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        .search-box .fa-search {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .search-box input {
+            padding-left: 40px;
+            border-radius: 25px;
+        }
+        .comprobante-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+            <h4 class="text-center mb-4"><i class="fas fa-tshirt me-2"></i>Kollita Shop</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" data-section="panel-financiero"><i class="fas fa-chart-pie me-2"></i>Panel Financiero</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="compras-restock"><i class="fas fa-box-open me-2"></i>Compras y Restock</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="catalogo-inventario"><i class="fas fa-tags me-2"></i>Catálogo e Inventario</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="clientes-ventas"><i class="fas fa-users me-2"></i>Clientes y Ventas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="logistica-gastos"><i class="fas fa-truck me-2"></i>Logística y Gastos</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-lg-10 main-content">
+            <!-- Panel Financiero -->
+            <section id="seccion-panel-financiero" class="fade-in">
+                <h2 class="mb-4"><i class="fas fa-chart-pie text-primary me-2"></i>Vista Financiera Unificada</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title">Ingresos Totales</h5>
+                                <h3>Bs. 0.00</h3>
+                                <small>Actualizado al día de hoy</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-danger">
+                            <div class="card-body">
+                                <h5 class="card-title">Egresos Totales</h5>
+                                <h3>Bs. 0.00</h3>
+                                <small>Restock + Gastos Operativos</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Balance Neto</h5>
+                                <h3>Bs. 0.00</h3>
+                                <small>Ingresos - Egresos</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-table me-2"></i>Balance Diario Detallado</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Egresos Restock</th>
+                                        <th>Egresos Operativos</th>
+                                        <th>Ingresos Live</th>
+                                        <th>Ingresos Feria</th>
+                                        <th>Balance del día</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-balance"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Compras y Restock -->
+            <section id="seccion-compras-restock" class="section-hidden fade-in">
+                <h2 class="mb-4"><i class="fas fa-box-open text-primary me-2"></i>Compras y Restock Semanal</h2>
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-plus-circle me-2"></i>Registrar Nueva Compra</div>
+                    <div class="card-body">
+                        <form id="form-restock">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Fecha Compra</label>
+                                    <input type="date" class="form-control" id="restock-fecha" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Monto Total Invertido (Bs.)</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="restock-monto" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Origen de Fondos</label>
+                                    <input type="text" class="form-control" id="restock-origen" placeholder="Ej: Reinversión" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Observaciones</label>
+                                    <textarea class="form-control" id="restock-obs" rows="2"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar Compra</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-list me-2"></i>Historial de Compras</div>
+                    <div class="card-body">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="buscar-restock" placeholder="Buscar compras...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Monto</th>
+                                        <th>Origen</th>
+                                        <th>Observaciones</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-restocks"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Catálogo e Inventario -->
+            <section id="seccion-catalogo-inventario" class="section-hidden fade-in">
+                <h2 class="mb-4"><i class="fas fa-tags text-primary me-2"></i>Catálogo e Inventario</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-layer-group me-2"></i>Categorías y Marcas</div>
+                            <div class="card-body">
+                                <form id="form-categoria" class="mb-3">
+                                    <label class="form-label">Nueva Categoría</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="categoria-nombre" placeholder="Ej: Camisas" required>
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-plus"></i></button>
+                                    </div>
+                                </form>
+                                <form id="form-marca" class="mb-3">
+                                    <label class="form-label">Nueva Marca</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="marca-nombre" placeholder="Ej: Nike" required>
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-plus"></i></button>
+                                    </div>
+                                </form>
+                                <div class="row">
+                                    <div class="col">
+                                        <h6>Categorías existentes</h6>
+                                        <ul class="list-group" id="lista-categorias"></ul>
+                                    </div>
+                                    <div class="col">
+                                        <h6>Marcas existentes</h6>
+                                        <ul class="list-group" id="lista-marcas"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-tshirt me-2"></i>Registrar Prenda Única</div>
+                            <div class="card-body">
+                                <form id="form-producto-live">
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Categoría</label>
+                                            <select class="form-select" id="pl-categoria" required></select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Marca</label>
+                                            <select class="form-select" id="pl-marca" required></select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Descripción</label>
+                                            <input type="text" class="form-control" id="pl-descripcion" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Talla</label>
+                                            <input type="text" class="form-control" id="pl-talla">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Estado</label>
+                                            <select class="form-select" id="pl-estado">
+                                                <option>EXCELENTE</option>
+                                                <option>USADO_A</option>
+                                                <option>USADO_B</option>
+                                                <option>DETALLE</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Rareza</label>
+                                            <select class="form-select" id="pl-rareza">
+                                                <option>ALTA</option>
+                                                <option>MEDIA</option>
+                                                <option>REGULAR</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Costo (Bs.)</label>
+                                            <input type="number" step="0.01" min="0" class="form-control" id="pl-costo" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Precio Mínimo (Bs.)</label>
+                                            <input type="number" step="0.01" min="0" class="form-control" id="pl-min" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Precio Máximo (Bs.)</label>
+                                            <input type="number" step="0.01" min="0" class="form-control" id="pl-max" required>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-save me-1"></i>Guardar Prenda</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-header"><i class="fas fa-list me-2"></i>Inventario de Prendas Únicas</div>
+                    <div class="card-body">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="buscar-productos" placeholder="Buscar prendas...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Descripción</th>
+                                        <th>Categoría</th>
+                                        <th>Marca</th>
+                                        <th>Talla</th>
+                                        <th>Estado</th>
+                                        <th>Rareza</th>
+                                        <th>Precio Costo</th>
+                                        <th>Rango Precio</th>
+                                        <th>Disponibilidad</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-productos-live"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clientes y Ventas -->
+            <section id="seccion-clientes-ventas" class="section-hidden fade-in">
+                <h2 class="mb-4"><i class="fas fa-users text-primary me-2"></i>Clientes y Ventas Directas</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-user-plus me-2"></i>Registrar Cliente</div>
+                            <div class="card-body">
+                                <form id="form-cliente">
+                                    <div class="mb-2">
+                                        <label class="form-label">Nombre Completo</label>
+                                        <input type="text" class="form-control" id="cliente-nombre" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Usuario TikTok</label>
+                                        <input type="text" class="form-control" id="cliente-tiktok">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Teléfono WhatsApp</label>
+                                        <input type="text" class="form-control" id="cliente-telefono" required>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Ciudad Destino</label>
+                                        <input type="text" class="form-control" id="cliente-ciudad">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar Cliente</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-shopping-cart me-2"></i>Nueva Venta</div>
+                            <div class="card-body">
+                                <form id="form-venta">
+                                    <div class="mb-2">
+                                        <label class="form-label">Cliente</label>
+                                        <select class="form-select" id="venta-cliente" required></select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Prenda a Vender</label>
+                                        <select class="form-select" id="venta-producto" required>
+                                            <option value="">Seleccione una prenda disponible...</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Canal</label>
+                                        <select class="form-select" id="venta-canal">
+                                            <option>TIKTOK_LIVE</option>
+                                            <option>WHATSAPP</option>
+                                            <option>PRESENCIAL</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Estado</label>
+                                        <select class="form-select" id="venta-estado">
+                                            <option>COMPLETADO</option>
+                                            <option>PAGADO</option>
+                                            <option>RESERVADO</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Precio Venta (Bs.)</label>
+                                        <input type="number" step="0.01" min="0" class="form-control" id="venta-precio" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-cash-register me-2"></i>Registrar Venta</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-header"><i class="fas fa-list me-2"></i>Listado de Ventas</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Canal</th>
+                                        <th>Estado</th>
+                                        <th>Prenda</th>
+                                        <th>Precio</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-ventas"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logística y Gastos -->
+            <section id="seccion-logistica-gastos" class="section-hidden fade-in">
+                <h2 class="mb-4"><i class="fas fa-truck text-primary me-2"></i>Logística y Gastos Operativos</h2>
+                
+                <!-- Tarjeta para registrar despacho -->
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-shipping-fast me-2"></i>Registrar Despacho / Envío</div>
+                    <div class="card-body">
+                        <form id="form-despacho">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Venta</label>
+                                    <select class="form-select" id="despacho-id-venta" required>
+                                        <option value="">Seleccione una venta...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Tipo de Despacho</label>
+                                    <select class="form-select" id="despacho-tipo" required>
+                                        <option value="ENTREGA_LOCAL">Entrega Local</option>
+                                        <option value="PUNTO_ENTREGA">Punto de Entrega</option>
+                                        <option value="ENVIO_NACIONAL">Envío Nacional</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Dirección o Lugar de Entrega</label>
+                                    <input type="text" class="form-control" id="despacho-direccion" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Costo de Envío (Bs.)</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="despacho-costo" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Estado Logístico</label>
+                                    <select class="form-select" id="despacho-estado">
+                                        <option>EMPACADO</option>
+                                        <option>LISTO_ENTREGA</option>
+                                        <option>ENTREGADO</option>
+                                        <option>DEVUELTO</option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="comprobante-container">
+                                    <label class="form-label">Comprobante (obligatorio para envío nacional y punto de entrega)</label>
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="despacho-comprobante-file" accept="image/*">
+                                        <span class="input-group-text">o</span>
+                                        <input type="text" class="form-control" id="despacho-comprobante-url" placeholder="Pega aquí el enlace de la imagen">
+                                    </div>
+                                    <small class="text-muted">Puedes subir una foto o pegar un enlace (URL) de la imagen</small>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar Despacho</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabla de despachos -->
+                <div class="card mt-3">
+                    <div class="card-header"><i class="fas fa-list me-2"></i>Listado de Despachos</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Venta</th>
+                                        <th>Tipo</th>
+                                        <th>Dirección</th>
+                                        <th>Costo</th>
+                                        <th>Comprobante</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-despachos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta para gastos -->
+                <div class="card mt-4">
+                    <div class="card-header"><i class="fas fa-file-invoice-dollar me-2"></i>Registrar Gasto Operativo</div>
+                    <div class="card-body">
+                        <form id="form-gasto">
+                            <div class="mb-2">
+                                <label class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="gasto-fecha" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Categoría</label>
+                                <select class="form-select" id="gasto-categoria">
+                                    <option>PASAJES_TRANSPORTE</option>
+                                    <option>BOLSA_EMPAQUE</option>
+                                    <option>ALIMENTACION</option>
+                                    <option>PUESTO_FERIA</option>
+                                    <option>COMISION_PAGO</option>
+                                    <option>OTRO</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Descripción</label>
+                                <input type="text" class="form-control" id="gasto-descripcion" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Monto (Bs.)</label>
+                                <input type="number" step="0.01" min="0.01" class="form-control" id="gasto-monto" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar Gasto</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabla de gastos -->
+                <div class="card mt-3">
+                    <div class="card-header"><i class="fas fa-list me-2"></i>Registros de Gastos</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Categoría</th>
+                                        <th>Descripción</th>
+                                        <th>Monto</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-gastos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // ========== CONFIGURACIÓN ==========
+    const API_URL = 'http://localhost:3000/api';
+
+    // ========== FUNCIONES DE API ==========
+    async function fetchAPI(endpoint, method = 'GET', body = null) {
+        const options = {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+        };
+        if (body) options.body = JSON.stringify(body);
+        
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, options);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Error en la petición');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    // ========== FUNCIONES DE UI ==========
+    function formatearPrecio(precio) {
+        return `Bs. ${parseFloat(precio).toFixed(2)}`;
+    }
+
+    function mostrarError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje,
+            confirmButtonColor: '#6c5ce7'
+        });
+    }
+
+    function mostrarExito(mensaje) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: mensaje,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+
+    async function confirmarEliminacion(tabla, id, nombre = '') {
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: `Se eliminará ${nombre} (ID: ${id})`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e17055',
+            cancelButtonColor: '#6c5ce7',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await fetchAPI(`/${tabla}/${id}`, 'DELETE');
+                mostrarExito('Registro eliminado correctamente');
+                cargarDatos();
+            } catch (error) {
+                mostrarError(error.message);
+            }
+        }
+    }
+
+    // ========== NAVEGACIÓN ==========
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            const section = link.dataset.section;
+            document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('section-hidden'));
+            document.getElementById(`seccion-${section}`).classList.remove('section-hidden');
+        });
+    });
+
+    // ========== CARGAR DATOS ==========
+    async function cargarDatos() {
+        try {
+            // Categorías
+            const categorias = await fetchAPI('/categorias');
+            const selectCategoria = document.getElementById('pl-categoria');
+            selectCategoria.innerHTML = '<option value="">Seleccione...</option>';
+            categorias.forEach(cat => {
+                selectCategoria.innerHTML += `<option value="${cat.id_categoria}">${cat.nombre_categoria}</option>`;
+            });
+
+            // Marcas
+            const marcas = await fetchAPI('/marcas');
+            const selectMarca = document.getElementById('pl-marca');
+            selectMarca.innerHTML = '<option value="">Seleccione...</option>';
+            marcas.forEach(mar => {
+                selectMarca.innerHTML += `<option value="${mar.id_marca}">${mar.nombre_marca}</option>`;
+            });
+
+            // Clientes
+            const clientes = await fetchAPI('/clientes');
+            const selectCliente = document.getElementById('venta-cliente');
+            selectCliente.innerHTML = '<option value="">Seleccione...</option>';
+            clientes.forEach(cli => {
+                selectCliente.innerHTML += `<option value="${cli.id_cliente}">${cli.nombre_completo} (${cli.telefono_whatsapp})</option>`;
+            });
+
+            // Productos disponibles para venta
+            const productos = await fetchAPI('/productos-live');
+            const selectProducto = document.getElementById('venta-producto');
+            selectProducto.innerHTML = '<option value="">Seleccione una prenda disponible...</option>';
+            productos.filter(p => p.estado_disponibilidad === 'DISPONIBLE').forEach(prod => {
+                selectProducto.innerHTML += `<option value="${prod.id_producto_live}">${prod.nombre_descripcion} - ${prod.nombre_marca} (${prod.talla || 'Sin talla'}) - ${formatearPrecio(prod.umbral_precio_min)}</option>`;
+            });
+
+            // Ventas para despacho
+            const ventas = await fetchAPI('/ventas');
+            const selectVentaDespacho = document.getElementById('despacho-id-venta');
+            selectVentaDespacho.innerHTML = '<option value="">Seleccione una venta...</option>';
+            ventas.forEach(v => {
+                selectVentaDespacho.innerHTML += `<option value="${v.id_venta}">#${v.id_venta} - ${v.cliente_nombre} (${v.estado_venta})</option>`;
+            });
+
+            // Cargar listas y tablas
+            cargarListaCategorias();
+            cargarListaMarcas();
+            cargarRestocks();
+            cargarProductos();
+            cargarVentas();
+            cargarDespachos();
+            cargarGastos();
+            cargarBalance();
+        } catch (error) {
+            console.error('Error cargando datos:', error);
+        }
+    }
+
+    function cargarListaCategorias() {
+        fetchAPI('/categorias').then(categorias => {
+            const lista = document.getElementById('lista-categorias');
+            lista.innerHTML = '';
+            categorias.forEach(cat => {
+                lista.innerHTML += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${cat.nombre_categoria}
+                        <button class="btn btn-action btn-delete" onclick="confirmarEliminacion('categorias', ${cat.id_categoria}, '${cat.nombre_categoria}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </li>`;
+            });
+        });
+    }
+
+    function cargarListaMarcas() {
+        fetchAPI('/marcas').then(marcas => {
+            const lista = document.getElementById('lista-marcas');
+            lista.innerHTML = '';
+            marcas.forEach(mar => {
+                lista.innerHTML += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${mar.nombre_marca}
+                        <button class="btn btn-action btn-delete" onclick="confirmarEliminacion('marcas', ${mar.id_marca}, '${mar.nombre_marca}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </li>`;
+            });
+        });
+    }
+
+    function cargarRestocks() {
+        fetchAPI('/restocks').then(restocks => {
+            const tbody = document.getElementById('tabla-restocks');
+            tbody.innerHTML = '';
+            restocks.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.id_restock}</td>
+                        <td>${r.fecha_compra}</td>
+                        <td>${formatearPrecio(r.monto_total_invertido)}</td>
+                        <td>${r.origen_fondos}</td>
+                        <td>${r.observaciones || '-'}</td>
+                        <td>
+                            <button class="btn btn-action btn-delete" onclick="confirmarEliminacion('restocks', ${r.id_restock}, 'Compra del ${r.fecha_compra}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
+
+    function cargarProductos() {
+        fetchAPI('/productos-live').then(productos => {
+            const tbody = document.getElementById('tabla-productos-live');
+            tbody.innerHTML = '';
+            productos.forEach(p => {
+                const statusClass = `status-${p.estado_disponibilidad.toLowerCase()}`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${p.id_producto_live}</td>
+                        <td>${p.nombre_descripcion}</td>
+                        <td>${p.nombre_categoria}</td>
+                        <td>${p.nombre_marca}</td>
+                        <td>${p.talla || '-'}</td>
+                        <td>${p.estado_prenda}</td>
+                        <td>${p.nivel_rareza}</td>
+                        <td>${formatearPrecio(p.precio_costo_estimado)}</td>
+                        <td>${formatearPrecio(p.umbral_precio_min)} - ${formatearPrecio(p.umbral_precio_max)}</td>
+                        <td><span class="status-badge ${statusClass}">${p.estado_disponibilidad}</span></td>
+                        <td>
+                            <button class="btn btn-action btn-delete" onclick="confirmarEliminacion('productos-live', ${p.id_producto_live}, '${p.nombre_descripcion}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
+
+    function cargarVentas() {
+        fetchAPI('/ventas').then(ventas => {
+            const tbody = document.getElementById('tabla-ventas');
+            tbody.innerHTML = '';
+            ventas.forEach(v => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${v.id_venta}</td>
+                        <td>${v.cliente_nombre}</td>
+                        <td>${new Date(v.fecha_venta).toLocaleString()}</td>
+                        <td>${v.canal_venta}</td>
+                        <td>${v.estado_venta}</td>
+                        <td>${v.producto_descripcion || 'Sin producto'}</td>
+                        <td>${formatearPrecio(v.precio_venta_real)}</td>
+                        <td>
+                            <button class="btn btn-action btn-delete" onclick="confirmarEliminacion('ventas', ${v.id_venta}, 'Venta #${v.id_venta}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
+
+    function cargarDespachos() {
+        fetchAPI('/despachos').then(despachos => {
+            const tbody = document.getElementById('tabla-despachos');
+            tbody.innerHTML = '';
+            despachos.forEach(d => {
+                let comprobanteHtml = '-';
+                if (d.comprobante_respaldo) {
+                    if (d.comprobante_respaldo.startsWith('/uploads/') || d.comprobante_respaldo.startsWith('http')) {
+                        comprobanteHtml = `<a href="${d.comprobante_respaldo}" target="_blank"><img src="${d.comprobante_respaldo}" alt="Comprobante" class="comprobante-img"></a>`;
+                    } else {
+                        comprobanteHtml = `<a href="${d.comprobante_respaldo}" target="_blank">Ver enlace</a>`;
+                    }
+                }
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${d.id_despacho}</td>
+                        <td>#${d.id_venta}</td>
+                        <td>${d.tipo_despacho}</td>
+                        <td>${d.direccion_o_lugar}</td>
+                        <td>${formatearPrecio(d.costo_envio)}</td>
+                        <td>${comprobanteHtml}</td>
+                        <td>${d.estado_logistico}</td>
+                        <td>
+                            <button class="btn btn-action btn-delete" onclick="confirmarEliminacion('despachos', ${d.id_despacho}, 'Despacho #${d.id_despacho}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
+
+    function cargarGastos() {
+        fetchAPI('/gastos').then(gastos => {
+            const tbody = document.getElementById('tabla-gastos');
+            tbody.innerHTML = '';
+            gastos.forEach(g => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${g.id_gasto}</td>
+                        <td>${g.fecha_gasto}</td>
+                        <td>${g.categoria_gasto}</td>
+                        <td>${g.descripcion}</td>
+                        <td>${formatearPrecio(g.monto)}</td>
+                        <td>
+                            <button class="btn btn-action btn-delete" onclick="confirmarEliminacion('gastos', ${g.id_gasto}, '${g.descripcion}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
+
+    function cargarBalance() {
+        Promise.all([
+            fetchAPI('/restocks'),
+            fetchAPI('/gastos'),
+            fetchAPI('/ventas')
+        ]).then(([restocks, gastos, ventas]) => {
+            let totalIngresos = 0;
+            let totalEgresos = 0;
+            
+            restocks.forEach(r => totalEgresos += parseFloat(r.monto_total_invertido));
+            gastos.forEach(g => totalEgresos += parseFloat(g.monto));
+            ventas.forEach(v => {
+                if (v.estado_venta !== 'CANCELADO') {
+                    totalIngresos += parseFloat(v.precio_venta_real || 0);
+                }
+            });
+
+            document.querySelectorAll('.bg-success .card-body h3')[0].textContent = formatearPrecio(totalIngresos);
+            document.querySelectorAll('.bg-danger .card-body h3')[0].textContent = formatearPrecio(totalEgresos);
+            document.querySelectorAll('.bg-primary .card-body h3')[0].textContent = formatearPrecio(totalIngresos - totalEgresos);
+        });
+    }
+
+    // ========== MANEJO DE FORMULARIOS ==========
+    document.getElementById('form-restock').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            fecha_compra: document.getElementById('restock-fecha').value,
+            monto_total_invertido: parseFloat(document.getElementById('restock-monto').value),
+            origen_fondos: document.getElementById('restock-origen').value,
+            observaciones: document.getElementById('restock-obs').value
+        };
+        
+        try {
+            await fetchAPI('/restocks', 'POST', data);
+            mostrarExito('Compra registrada correctamente');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    document.getElementById('form-categoria').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById('categoria-nombre').value.trim();
+        
+        try {
+            await fetchAPI('/categorias', 'POST', { nombre_categoria: nombre });
+            mostrarExito('Categoría creada');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    document.getElementById('form-marca').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById('marca-nombre').value.trim();
+        
+        try {
+            await fetchAPI('/marcas', 'POST', { nombre_marca: nombre });
+            mostrarExito('Marca creada');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    document.getElementById('form-producto-live').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Obtener el último restock para asignar el detalle automáticamente
+        const restocks = await fetchAPI('/restocks');
+        const ultimoRestock = restocks[0];
+        
+        if (!ultimoRestock) {
+            mostrarError('No hay restocks registrados. Registre una compra primero.');
+            return;
+        }
+
+        // Crear detalle de restock automáticamente
+        const detalleData = {
+            id_restock: ultimoRestock.id_restock,
+            tipo_adquisicion: 'LOTE_SELECCIONADO',
+            descripcion_partida: document.getElementById('pl-descripcion').value,
+            costo_partida: parseFloat(document.getElementById('pl-costo').value),
+            cantidad_piezas_estimada: 1
+        };
+
+        try {
+            const detalle = await fetchAPI('/detalles-restock', 'POST', detalleData);
+            
+            const productoData = {
+                id_detalle_restock: detalle.id_detalle_restock,
+                id_categoria: parseInt(document.getElementById('pl-categoria').value),
+                id_marca: parseInt(document.getElementById('pl-marca').value),
+                nombre_descripcion: document.getElementById('pl-descripcion').value,
+                talla: document.getElementById('pl-talla').value,
+                estado_prenda: document.getElementById('pl-estado').value,
+                nivel_rareza: document.getElementById('pl-rareza').value,
+                precio_costo_estimado: parseFloat(document.getElementById('pl-costo').value),
+                umbral_precio_min: parseFloat(document.getElementById('pl-min').value),
+                umbral_precio_max: parseFloat(document.getElementById('pl-max').value)
+            };
+            
+            await fetchAPI('/productos-live', 'POST', productoData);
+            mostrarExito('Prenda registrada correctamente');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    document.getElementById('form-cliente').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            nombre_completo: document.getElementById('cliente-nombre').value,
+            usuario_tiktok: document.getElementById('cliente-tiktok').value,
+            telefono_whatsapp: document.getElementById('cliente-telefono').value,
+            ciudad_destino: document.getElementById('cliente-ciudad').value
+        };
+        
+        try {
+            await fetchAPI('/clientes', 'POST', data);
+            mostrarExito('Cliente registrado');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    document.getElementById('form-venta').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            id_cliente: parseInt(document.getElementById('venta-cliente').value),
+            canal_venta: document.getElementById('venta-canal').value,
+            estado_venta: document.getElementById('venta-estado').value,
+            id_producto_live: parseInt(document.getElementById('venta-producto').value),
+            precio_venta_real: parseFloat(document.getElementById('venta-precio').value)
+        };
+        
+        try {
+            await fetchAPI('/ventas', 'POST', data);
+            mostrarExito('Venta registrada correctamente');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    document.getElementById('form-despacho').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const id_venta = parseInt(document.getElementById('despacho-id-venta').value);
+        const tipo_despacho = document.getElementById('despacho-tipo').value;
+        const direccion_o_lugar = document.getElementById('despacho-direccion').value;
+        const costo_envio = parseFloat(document.getElementById('despacho-costo').value);
+        const estado_logistico = document.getElementById('despacho-estado').value;
+        const fileInput = document.getElementById('despacho-comprobante-file');
+        const urlInput = document.getElementById('despacho-comprobante-url');
+        
+        if (!id_venta || !direccion_o_lugar || !costo_envio) {
+            mostrarError('Por favor complete los campos obligatorios');
+            return;
+        }
+        
+        // Validar comprobante para tipos que lo requieren
+        if (tipo_despacho === 'ENVIO_NACIONAL' || tipo_despacho === 'PUNTO_ENTREGA') {
+            if (!fileInput.files[0] && !urlInput.value.trim()) {
+                mostrarError('Debe subir una foto o proporcionar un enlace del comprobante');
+                return;
+            }
+        }
+        
+        // Crear FormData para enviar archivo
+        const formData = new FormData();
+        formData.append('id_venta', id_venta);
+        formData.append('tipo_despacho', tipo_despacho);
+        formData.append('direccion_o_lugar', direccion_o_lugar);
+        formData.append('costo_envio', costo_envio);
+        formData.append('estado_logistico', estado_logistico);
+        if (fileInput.files[0]) {
+            formData.append('comprobante', fileInput.files[0]);
+        } else if (urlInput.value.trim()) {
+            formData.append('comprobante_url', urlInput.value.trim());
+        }
+        
+        try {
+            const response = await fetch(`${API_URL}/despachos`, {
+                method: 'POST',
+                body: formData // No establecer Content-Type, lo hace automáticamente
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Error al registrar despacho');
+            }
+            const data = await response.json();
+            mostrarExito('Despacho registrado correctamente');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    document.getElementById('form-gasto').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            fecha_gasto: document.getElementById('gasto-fecha').value,
+            categoria_gasto: document.getElementById('gasto-categoria').value,
+            descripcion: document.getElementById('gasto-descripcion').value,
+            monto: parseFloat(document.getElementById('gasto-monto').value)
+        };
+        
+        try {
+            await fetchAPI('/gastos', 'POST', data);
+            mostrarExito('Gasto registrado');
+            e.target.reset();
+            cargarDatos();
+        } catch (error) {
+            mostrarError(error.message);
+        }
+    });
+
+    // ========== BÚSQUEDA ==========
+    document.getElementById('buscar-restock').addEventListener('input', (e) => {
+        const filtro = e.target.value.toLowerCase();
+        const filas = document.querySelectorAll('#tabla-restocks tr');
+        filas.forEach(fila => {
+            const texto = fila.textContent.toLowerCase();
+            fila.style.display = texto.includes(filtro) ? '' : 'none';
+        });
+    });
+
+    document.getElementById('buscar-productos').addEventListener('input', (e) => {
+        const filtro = e.target.value.toLowerCase();
+        const filas = document.querySelectorAll('#tabla-productos-live tr');
+        filas.forEach(fila => {
+            const texto = fila.textContent.toLowerCase();
+            fila.style.display = texto.includes(filtro) ? '' : 'none';
+        });
+    });
+
+    // ========== INICIAR ==========
+    cargarDatos();
+</script>
+</body>
+</html>
