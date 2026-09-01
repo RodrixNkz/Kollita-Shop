@@ -4,271 +4,263 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kollita Shop - Gestión de Tienda</title>
-    <!-- Favicon (ojo estilizado) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23FFC107'/><path d='M50 20 C30 20 15 35 10 50 C15 65 30 80 50 80 C70 80 85 65 90 50 C85 35 70 20 50 20 Z' fill='none' stroke='%23000' stroke-width='8'/><circle cx='50' cy='50' r='15' fill='%23000'/></svg>">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (graffiti/caligrafía) -->
-    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
             --amarillo: #FFC107;
-            --amarillo-oscuro: #FFA000;
-            --amarillo-claro: #FFD54F;
+            --amarillo-oscuro: #E5A800;
+            --amarillo-claro: #FFF3CD;
             --negro: #1a1a1a;
-            --negro-suave: #2d2d2d;
-            --negro-medio: #404040;
+            --gris-oscuro: #2d2d2d;
+            --gris-claro: #fafafa;
             --blanco: #ffffff;
-            --amarillo-palido: #FFF8E1;
-            --success: #4CAF50;
-            --danger: #f44336;
-            --card-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            --transition: all 0.3s ease;
+            --success: #28a745;
+            --danger: #dc3545;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --transition: all 0.25s ease;
         }
-        * { font-family: 'Inter', sans-serif; }
+
+        * { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+        }
+
         body { 
-            background: #f5f5f5; 
+            background: #fafafa; 
         }
-        
-        /* Sidebar estilo punk-rock */
+
+        /* Sidebar limpio */
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
+            background: #1a1a1a;
             color: white;
-            padding: 1.5rem 1rem;
+            padding: 2rem 1rem;
             position: sticky;
             top: 0;
-            border-right: 3px solid var(--amarillo);
         }
-        
-        /* Logo en sidebar */
+
+        /* Logo simple */
         .logo-container {
             text-align: center;
             margin-bottom: 2rem;
-            padding: 1rem;
+            padding: 1.5rem 1rem;
             background: var(--amarillo);
-            border-radius: 15px;
-            border: 3px solid #000;
-            box-shadow: 5px 5px 0 #000;
+            border-radius: 12px;
         }
-        
-        .logo-emoji {
-            font-size: 3rem;
-            line-height: 1;
-        }
-        
+
         .logo-text {
-            font-family: 'Permanent Marker', cursive;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            font-weight: 700;
             color: #000;
-            letter-spacing: 2px;
-            transform: rotate(-2deg);
+            letter-spacing: -0.5px;
         }
-        
+
         .logo-subtext {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: #000;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: bold;
+            letter-spacing: 4px;
+            font-weight: 600;
+            opacity: 0.7;
         }
-        
+
         .sidebar .nav-link {
-            color: rgba(255,255,255,0.7);
-            border-radius: 10px;
-            margin-bottom: 8px;
+            color: rgba(255,255,255,0.65);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            padding: 0.75rem 1rem;
             transition: var(--transition);
             cursor: pointer;
-            border: 2px solid transparent;
+            font-size: 0.9rem;
             font-weight: 500;
         }
-        
+
         .sidebar .nav-link:hover {
-            background: rgba(255,193,7,0.1);
-            color: var(--amarillo);
-            border-color: var(--amarillo);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
         }
-        
+
         .sidebar .nav-link.active {
             background: var(--amarillo);
             color: #000;
-            box-shadow: 3px 3px 0 #000;
-            border-color: #000;
-            font-weight: bold;
+            font-weight: 600;
         }
-        
-        .sidebar .nav-link.active i {
-            color: #000;
-        }
-        
+
         .main-content {
             padding: 2rem;
+            max-width: 1400px;
         }
-        
-        /* Tarjetas con estilo punk */
+
+        /* Tarjetas limpias */
         .card {
-            border: 2px solid #000;
-            border-radius: 15px;
-            box-shadow: 5px 5px 0 rgba(0,0,0,0.8);
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
             transition: var(--transition);
             margin-bottom: 1.5rem;
             background: white;
-            overflow: hidden;
         }
-        
+
         .card:hover { 
-            box-shadow: 8px 8px 0 rgba(0,0,0,0.8);
-            transform: translate(-2px, -2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
-        
+
         .card-header {
-            background: var(--negro);
+            background: #1a1a1a;
             color: var(--amarillo);
-            border-bottom: 3px solid var(--amarillo);
+            border-bottom: none;
             font-weight: 600;
-            border-radius: 0 !important;
-            padding: 1rem 1.25rem;
-            font-family: 'Permanent Marker', cursive;
-            letter-spacing: 1px;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 0.9rem 1.25rem;
+            font-size: 0.95rem;
         }
-        
-        .card-header i {
-            color: var(--amarillo);
-        }
-        
-        /* Botones amarillos */
+
+        /* Botones */
         .btn-primary {
             background: var(--amarillo);
-            border: 2px solid #000;
+            border: none;
             color: #000;
-            font-weight: bold;
-            box-shadow: 3px 3px 0 #000;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
             transition: var(--transition);
         }
-        
+
         .btn-primary:hover {
             background: var(--amarillo-oscuro);
-            border-color: #000;
             color: #000;
-            box-shadow: 5px 5px 0 #000;
-            transform: translate(-1px, -1px);
+            transform: translateY(-1px);
         }
-        
-        .btn-primary:active {
-            box-shadow: 1px 1px 0 #000;
-            transform: translate(2px, 2px);
-        }
-        
+
         .form-control, .form-select {
-            border: 2px solid #000;
-            border-radius: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
             transition: var(--transition);
         }
-        
+
         .form-control:focus, .form-select:focus {
             border-color: var(--amarillo);
-            box-shadow: 0 0 0 0.25rem rgba(255,193,7,0.3);
+            box-shadow: 0 0 0 3px rgba(255,193,7,0.15);
         }
-        
-        /* Tablas estilo punk */
+
+        /* Tablas */
         .table {
-            border: 2px solid #000;
+            margin-bottom: 0;
         }
-        
+
         .table thead th {
-            background: var(--negro);
-            color: var(--amarillo);
+            background: #f5f5f5;
+            color: #333;
             font-weight: 600;
-            border-bottom: 3px solid var(--amarillo);
-            padding: 12px;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            padding: 0.75rem;
+            border-bottom: 2px solid var(--amarillo);
         }
-        
+
         .table tbody td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
         }
-        
+
         .table tbody tr:hover {
-            background: var(--amarillo-palido);
+            background: #fffef5;
         }
-        
-        /* Badges de estado */
+
+        /* Badges */
         .status-badge {
-            padding: 0.35em 0.65em;
-            border-radius: 50px;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: bold;
-            border: 2px solid #000;
+            font-weight: 600;
         }
-        
+
         .status-disponible { 
-            background: #4CAF50; 
-            color: white;
+            background: #d4edda; 
+            color: #155724;
         }
-        
+
         .status-reservado { 
-            background: #FFC107; 
-            color: #000;
+            background: #fff3cd; 
+            color: #856404;
         }
-        
+
         .status-vendido { 
-            background: #f44336; 
-            color: white;
+            background: #f8d7da; 
+            color: #721c24;
         }
-        
-        .section-hidden { display: none; }
-        .fade-in { animation: fadeIn 0.3s; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+
+        /* Botones de acción */
         .btn-action {
             padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-            margin: 0 2px;
-            border: 2px solid #000;
-            border-radius: 5px;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
             transition: var(--transition);
+            background: transparent;
         }
-        
+
         .btn-delete { 
-            color: #f44336; 
-            background: white;
+            color: #dc3545; 
         }
-        
+
         .btn-delete:hover { 
-            color: white; 
-            background: #f44336;
-            transform: scale(1.1);
+            background: #f8d7da; 
         }
-        
-        .btn-edit { 
-            color: #000;
-            background: var(--amarillo);
+
+        /* Títulos */
+        h2 {
+            font-weight: 700;
+            color: #1a1a1a;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem !important;
         }
-        
-        .btn-edit:hover { 
-            color: #000;
-            background: var(--amarillo-oscuro);
-            transform: scale(1.1);
+
+        h2 i {
+            color: var(--amarillo);
+            margin-right: 10px;
         }
-        
-        .table-responsive { overflow-x: auto; }
-        
+
+        /* Tarjetas de estadísticas */
+        .card.bg-success {
+            background: #28a745 !important;
+            border: none;
+        }
+
+        .card.bg-danger {
+            background: #dc3545 !important;
+            border: none;
+        }
+
+        .card.bg-primary {
+            background: var(--amarillo) !important;
+            border: none;
+            color: #000 !important;
+        }
+
+        .card.bg-primary .card-title,
+        .card.bg-primary h3,
+        .card.bg-primary small {
+            color: #000 !important;
+        }
+
+        /* Búsqueda */
         .search-box {
             position: relative;
             margin-bottom: 1rem;
         }
-        
+
         .search-box .fa-search {
             position: absolute;
             left: 15px;
@@ -276,57 +268,28 @@
             transform: translateY(-50%);
             color: #999;
         }
-        
+
         .search-box input {
             padding-left: 40px;
-            border-radius: 25px;
-            border: 2px solid #000;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
         }
-        
+
         .comprobante-img {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             object-fit: cover;
-            border-radius: 5px;
-            border: 2px solid #000;
+            border-radius: 4px;
+            border: 1px solid #ddd;
         }
+
+        .section-hidden { display: none; }
+        .fade-in { animation: fadeIn 0.3s; }
         
-        /* Estilo para los números/estadísticas */
-        .card.bg-success {
-            background: #4CAF50 !important;
-            border: 3px solid #000;
-            box-shadow: 5px 5px 0 #000;
-        }
-        
-        .card.bg-danger {
-            background: #f44336 !important;
-            border: 3px solid #000;
-            box-shadow: 5px 5px 0 #000;
-        }
-        
-        .card.bg-primary {
-            background: var(--amarillo) !important;
-            border: 3px solid #000;
-            box-shadow: 5px 5px 0 #000;
-            color: #000 !important;
-        }
-        
-        .card.bg-primary .card-title,
-        .card.bg-primary h3,
-        .card.bg-primary small {
-            color: #000 !important;
-        }
-        
-        /* Títulos de secciones */
-        h2 {
-            font-family: 'Permanent Marker', cursive;
-            color: #000;
-            letter-spacing: 1px;
-        }
-        
-        h2 i {
-            color: var(--amarillo);
-            text-shadow: 2px 2px 0 #000;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -335,9 +298,7 @@
     <div class="row">
         <!-- Sidebar -->
         <nav class="col-md-3 col-lg-2 sidebar d-none d-md-block">
-            <!-- Logo -->
             <div class="logo-container">
-                <div class="logo-emoji">👁️</div>
                 <div class="logo-text">Kollita</div>
                 <div class="logo-subtext">Shop</div>
             </div>
@@ -365,7 +326,7 @@
         <main class="col-md-9 col-lg-10 main-content">
             <!-- Panel Financiero -->
             <section id="seccion-panel-financiero" class="fade-in">
-                <h2 class="mb-4"><i class="fas fa-chart-pie me-2"></i>Vista Financiera Unificada</h2>
+                <h2 class="mb-4"><i class="fas fa-chart-pie"></i>Vista Financiera Unificada</h2>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="card text-white bg-success">
@@ -419,7 +380,7 @@
 
             <!-- Compras y Restock -->
             <section id="seccion-compras-restock" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-box-open me-2"></i>Compras y Restock Semanal</h2>
+                <h2 class="mb-4"><i class="fas fa-box-open"></i>Compras y Restock Semanal</h2>
                 <div class="card">
                     <div class="card-header"><i class="fas fa-plus-circle me-2"></i>Registrar Nueva Compra</div>
                     <div class="card-body">
@@ -476,7 +437,7 @@
 
             <!-- Catálogo e Inventario -->
             <section id="seccion-catalogo-inventario" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-tags me-2"></i>Catálogo e Inventario</h2>
+                <h2 class="mb-4"><i class="fas fa-tags"></i>Catálogo e Inventario</h2>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">
@@ -602,7 +563,7 @@
 
             <!-- Clientes y Ventas -->
             <section id="seccion-clientes-ventas" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-users me-2"></i>Clientes y Ventas Directas</h2>
+                <h2 class="mb-4"><i class="fas fa-users"></i>Clientes y Ventas Directas</h2>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">
@@ -697,7 +658,7 @@
 
             <!-- Logística y Gastos -->
             <section id="seccion-logistica-gastos" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-truck me-2"></i>Logística y Gastos Operativos</h2>
+                <h2 class="mb-4"><i class="fas fa-truck"></i>Logística y Gastos Operativos</h2>
                 
                 <div class="card">
                     <div class="card-header"><i class="fas fa-shipping-fast me-2"></i>Registrar Despacho / Envío</div>
@@ -890,7 +851,7 @@
             text: `Se eliminará ${nombre} (ID: ${id})`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#f44336',
+            confirmButtonColor: '#dc3545',
             cancelButtonColor: '#FFC107',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
@@ -921,7 +882,6 @@
     // ========== CARGAR DATOS ==========
     async function cargarDatos() {
         try {
-            // Categorías
             const categorias = await fetchAPI('/categorias');
             const selectCategoria = document.getElementById('pl-categoria');
             selectCategoria.innerHTML = '<option value="">Seleccione...</option>';
@@ -929,7 +889,6 @@
                 selectCategoria.innerHTML += `<option value="${cat.id_categoria}">${cat.nombre_categoria}</option>`;
             });
 
-            // Marcas
             const marcas = await fetchAPI('/marcas');
             const selectMarca = document.getElementById('pl-marca');
             selectMarca.innerHTML = '<option value="">Seleccione...</option>';
@@ -937,7 +896,6 @@
                 selectMarca.innerHTML += `<option value="${mar.id_marca}">${mar.nombre_marca}</option>`;
             });
 
-            // Clientes
             const clientes = await fetchAPI('/clientes');
             const selectCliente = document.getElementById('venta-cliente');
             selectCliente.innerHTML = '<option value="">Seleccione...</option>';
@@ -945,7 +903,6 @@
                 selectCliente.innerHTML += `<option value="${cli.id_cliente}">${cli.nombre_completo} (${cli.telefono_whatsapp})</option>`;
             });
 
-            // Productos disponibles para venta
             const productos = await fetchAPI('/productos-live');
             const selectProducto = document.getElementById('venta-producto');
             selectProducto.innerHTML = '<option value="">Seleccione una prenda disponible...</option>';
@@ -953,7 +910,6 @@
                 selectProducto.innerHTML += `<option value="${prod.id_producto_live}">${prod.nombre_descripcion} - ${prod.nombre_marca} (${prod.talla || 'Sin talla'}) - ${formatearPrecio(prod.umbral_precio_min)}</option>`;
             });
 
-            // Ventas para despacho
             const ventas = await fetchAPI('/ventas');
             const selectVentaDespacho = document.getElementById('despacho-id-venta');
             selectVentaDespacho.innerHTML = '<option value="">Seleccione una venta...</option>';
@@ -961,7 +917,6 @@
                 selectVentaDespacho.innerHTML += `<option value="${v.id_venta}">#${v.id_venta} - ${v.cliente_nombre} (${v.estado_venta})</option>`;
             });
 
-            // Cargar listas y tablas
             cargarListaCategorias();
             cargarListaMarcas();
             cargarRestocks();
