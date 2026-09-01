@@ -523,7 +523,7 @@
                                         <option>DEVUELTO</option>
                                     </select>
                                 </div>
-                                <div class="col-12" id="comprobante-container">
+                                <div class="col-12">
                                     <label class="form-label">Comprobante (obligatorio para envío nacional y punto de entrega)</label>
                                     <div class="input-group">
                                         <input type="file" class="form-control" id="despacho-comprobante-file" accept="image/*">
@@ -628,7 +628,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // ========== CONFIGURACIÓN ==========
-    const API_URL = 'kollita-shop-production.up.railway.app';
+    const API_URL = window.location.origin + '/api';
 
     // ========== FUNCIONES DE API ==========
     async function fetchAPI(endpoint, method = 'GET', body = null) {
@@ -1122,7 +1122,7 @@
         try {
             const response = await fetch(`${API_URL}/despachos`, {
                 method: 'POST',
-                body: formData // No establecer Content-Type, lo hace automáticamente
+                body: formData
             });
             if (!response.ok) {
                 const error = await response.json();
