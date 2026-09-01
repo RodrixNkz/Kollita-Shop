@@ -474,28 +474,33 @@ app.delete('/api/:tabla/:id', (req, res) => {
   }
 });
 
-// ================== SERVIDOR ESTÁTICO ==================
+// ================== SERVIR FRONTEND ==================
 const publicPath = path.join(__dirname, 'public');
 if (fs.existsSync(publicPath)) {
-  app.use(express.static(publicPath));
-  console.log('📁 Sirviendo archivos estáticos desde /public');
+    app.use(express.static(publicPath));
+    console.log('📁 Sirviendo frontend desde /public');
 } else {
-  console.log('⚠️ No se encontró carpeta public');
+    console.log('⚠️ No se encontró carpeta public');
 }
 
-// ================== RUTA CATCH-ALL PARA FRONTEND ==================
-// Esta ruta debe estar DESPUÉS de todas las rutas /api
-app.get('*', (req, res) => {
-  const indexPath = path.join(__dirname, 'public', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(404).json({ error: 'index.html no encontrado' });
-  }
+// Middleware para manejar rutas no-API
+app.use((req, res, next) => {
+    // Si es una ruta de API que no existe, devolver JSON
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'Endpoint no encontrado' });
+    }
+    
+    // Si es una ruta del frontend, servir index.html
+    const indexPath = path.join(__dirname, 'public', 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).json({ error: 'index.html no encontrado' });
+    }
 });
 
 // ================== INICIO DEL SERVIDOR ==================
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`📊 Base de datos: ${DB_PATH}`);
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`📊 Base de datos: ${DB_PATH}`);
 });
