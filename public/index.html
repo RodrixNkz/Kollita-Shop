@@ -4,106 +4,271 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kollita Shop - Gestión de Tienda</title>
+    <!-- Favicon (ojo estilizado) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23FFC107'/><path d='M50 20 C30 20 15 35 10 50 C15 65 30 80 50 80 C70 80 85 65 90 50 C85 35 70 20 50 20 Z' fill='none' stroke='%23000' stroke-width='8'/><circle cx='50' cy='50' r='15' fill='%23000'/></svg>">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts (graffiti/caligrafía) -->
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --success: #00b894;
-            --warning: #fdcb6e;
-            --danger: #e17055;
-            --dark-bg: #2d3436;
-            --light-bg: #f8f9fa;
-            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --amarillo: #FFC107;
+            --amarillo-oscuro: #FFA000;
+            --amarillo-claro: #FFD54F;
+            --negro: #1a1a1a;
+            --negro-suave: #2d2d2d;
+            --negro-medio: #404040;
+            --blanco: #ffffff;
+            --amarillo-palido: #FFF8E1;
+            --success: #4CAF50;
+            --danger: #f44336;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.2);
             --transition: all 0.3s ease;
         }
         * { font-family: 'Inter', sans-serif; }
-        body { background: var(--light-bg); }
+        body { 
+            background: #f5f5f5; 
+        }
+        
+        /* Sidebar estilo punk-rock */
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #2d3436 0%, #1e272e 100%);
+            background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
             color: white;
             padding: 1.5rem 1rem;
             position: sticky;
             top: 0;
+            border-right: 3px solid var(--amarillo);
         }
+        
+        /* Logo en sidebar */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--amarillo);
+            border-radius: 15px;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+        }
+        
+        .logo-emoji {
+            font-size: 3rem;
+            line-height: 1;
+        }
+        
+        .logo-text {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 1.8rem;
+            color: #000;
+            letter-spacing: 2px;
+            transform: rotate(-2deg);
+        }
+        
+        .logo-subtext {
+            font-size: 0.7rem;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+        
         .sidebar .nav-link {
             color: rgba(255,255,255,0.7);
-            border-radius: 8px;
-            margin-bottom: 5px;
+            border-radius: 10px;
+            margin-bottom: 8px;
             transition: var(--transition);
             cursor: pointer;
+            border: 2px solid transparent;
+            font-weight: 500;
         }
+        
         .sidebar .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
+            background: rgba(255,193,7,0.1);
+            color: var(--amarillo);
+            border-color: var(--amarillo);
         }
+        
         .sidebar .nav-link.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background: var(--amarillo);
+            color: #000;
+            box-shadow: 3px 3px 0 #000;
+            border-color: #000;
+            font-weight: bold;
         }
+        
+        .sidebar .nav-link.active i {
+            color: #000;
+        }
+        
         .main-content {
             padding: 2rem;
         }
+        
+        /* Tarjetas con estilo punk */
         .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
+            border: 2px solid #000;
+            border-radius: 15px;
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.8);
             transition: var(--transition);
             margin-bottom: 1.5rem;
-        }
-        .card:hover { box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
-        .card-header {
             background: white;
-            border-bottom: 1px solid #eee;
+            overflow: hidden;
+        }
+        
+        .card:hover { 
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.8);
+            transform: translate(-2px, -2px);
+        }
+        
+        .card-header {
+            background: var(--negro);
+            color: var(--amarillo);
+            border-bottom: 3px solid var(--amarillo);
             font-weight: 600;
-            border-radius: 12px 12px 0 0 !important;
+            border-radius: 0 !important;
             padding: 1rem 1.25rem;
+            font-family: 'Permanent Marker', cursive;
+            letter-spacing: 1px;
         }
-        .btn-primary { background: var(--primary); border: none; }
-        .btn-primary:hover { background: #5a4bd1; }
+        
+        .card-header i {
+            color: var(--amarillo);
+        }
+        
+        /* Botones amarillos */
+        .btn-primary {
+            background: var(--amarillo);
+            border: 2px solid #000;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 3px 3px 0 #000;
+            transition: var(--transition);
+        }
+        
+        .btn-primary:hover {
+            background: var(--amarillo-oscuro);
+            border-color: #000;
+            color: #000;
+            box-shadow: 5px 5px 0 #000;
+            transform: translate(-1px, -1px);
+        }
+        
+        .btn-primary:active {
+            box-shadow: 1px 1px 0 #000;
+            transform: translate(2px, 2px);
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #000;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
         .form-control:focus, .form-select:focus {
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 0.2rem rgba(108,92,231,0.25);
+            border-color: var(--amarillo);
+            box-shadow: 0 0 0 0.25rem rgba(255,193,7,0.3);
         }
-        .table th { font-weight: 600; color: #555; }
+        
+        /* Tablas estilo punk */
+        .table {
+            border: 2px solid #000;
+        }
+        
+        .table thead th {
+            background: var(--negro);
+            color: var(--amarillo);
+            font-weight: 600;
+            border-bottom: 3px solid var(--amarillo);
+            padding: 12px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        
+        .table tbody td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table tbody tr:hover {
+            background: var(--amarillo-palido);
+        }
+        
+        /* Badges de estado */
         .status-badge {
             padding: 0.35em 0.65em;
             border-radius: 50px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: bold;
+            border: 2px solid #000;
         }
-        .status-disponible { background: #d4edda; color: #155724; }
-        .status-reservado { background: #fff3cd; color: #856404; }
-        .status-vendido { background: #f8d7da; color: #721c24; }
+        
+        .status-disponible { 
+            background: #4CAF50; 
+            color: white;
+        }
+        
+        .status-reservado { 
+            background: #FFC107; 
+            color: #000;
+        }
+        
+        .status-vendido { 
+            background: #f44336; 
+            color: white;
+        }
+        
         .section-hidden { display: none; }
         .fade-in { animation: fadeIn 0.3s; }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
         .btn-action {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
             margin: 0 2px;
+            border: 2px solid #000;
+            border-radius: 5px;
+            transition: var(--transition);
         }
-        .btn-delete { color: var(--danger); }
-        .btn-delete:hover { color: #c0392b; }
-        .btn-edit { color: var(--primary); }
-        .btn-edit:hover { color: #5a4bd1; }
+        
+        .btn-delete { 
+            color: #f44336; 
+            background: white;
+        }
+        
+        .btn-delete:hover { 
+            color: white; 
+            background: #f44336;
+            transform: scale(1.1);
+        }
+        
+        .btn-edit { 
+            color: #000;
+            background: var(--amarillo);
+        }
+        
+        .btn-edit:hover { 
+            color: #000;
+            background: var(--amarillo-oscuro);
+            transform: scale(1.1);
+        }
+        
         .table-responsive { overflow-x: auto; }
+        
         .search-box {
             position: relative;
             margin-bottom: 1rem;
         }
+        
         .search-box .fa-search {
             position: absolute;
             left: 15px;
@@ -111,15 +276,57 @@
             transform: translateY(-50%);
             color: #999;
         }
+        
         .search-box input {
             padding-left: 40px;
             border-radius: 25px;
+            border: 2px solid #000;
         }
+        
         .comprobante-img {
             width: 50px;
             height: 50px;
             object-fit: cover;
             border-radius: 5px;
+            border: 2px solid #000;
+        }
+        
+        /* Estilo para los números/estadísticas */
+        .card.bg-success {
+            background: #4CAF50 !important;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+        }
+        
+        .card.bg-danger {
+            background: #f44336 !important;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+        }
+        
+        .card.bg-primary {
+            background: var(--amarillo) !important;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+            color: #000 !important;
+        }
+        
+        .card.bg-primary .card-title,
+        .card.bg-primary h3,
+        .card.bg-primary small {
+            color: #000 !important;
+        }
+        
+        /* Títulos de secciones */
+        h2 {
+            font-family: 'Permanent Marker', cursive;
+            color: #000;
+            letter-spacing: 1px;
+        }
+        
+        h2 i {
+            color: var(--amarillo);
+            text-shadow: 2px 2px 0 #000;
         }
     </style>
 </head>
@@ -128,7 +335,13 @@
     <div class="row">
         <!-- Sidebar -->
         <nav class="col-md-3 col-lg-2 sidebar d-none d-md-block">
-            <h4 class="text-center mb-4"><i class="fas fa-tshirt me-2"></i>Kollita Shop</h4>
+            <!-- Logo -->
+            <div class="logo-container">
+                <div class="logo-emoji">👁️</div>
+                <div class="logo-text">Kollita</div>
+                <div class="logo-subtext">Shop</div>
+            </div>
+            
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link active" data-section="panel-financiero"><i class="fas fa-chart-pie me-2"></i>Panel Financiero</a>
@@ -152,7 +365,7 @@
         <main class="col-md-9 col-lg-10 main-content">
             <!-- Panel Financiero -->
             <section id="seccion-panel-financiero" class="fade-in">
-                <h2 class="mb-4"><i class="fas fa-chart-pie text-primary me-2"></i>Vista Financiera Unificada</h2>
+                <h2 class="mb-4"><i class="fas fa-chart-pie me-2"></i>Vista Financiera Unificada</h2>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="card text-white bg-success">
@@ -206,7 +419,7 @@
 
             <!-- Compras y Restock -->
             <section id="seccion-compras-restock" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-box-open text-primary me-2"></i>Compras y Restock Semanal</h2>
+                <h2 class="mb-4"><i class="fas fa-box-open me-2"></i>Compras y Restock Semanal</h2>
                 <div class="card">
                     <div class="card-header"><i class="fas fa-plus-circle me-2"></i>Registrar Nueva Compra</div>
                     <div class="card-body">
@@ -263,7 +476,7 @@
 
             <!-- Catálogo e Inventario -->
             <section id="seccion-catalogo-inventario" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-tags text-primary me-2"></i>Catálogo e Inventario</h2>
+                <h2 class="mb-4"><i class="fas fa-tags me-2"></i>Catálogo e Inventario</h2>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">
@@ -389,7 +602,7 @@
 
             <!-- Clientes y Ventas -->
             <section id="seccion-clientes-ventas" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-users text-primary me-2"></i>Clientes y Ventas Directas</h2>
+                <h2 class="mb-4"><i class="fas fa-users me-2"></i>Clientes y Ventas Directas</h2>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card">
@@ -484,9 +697,8 @@
 
             <!-- Logística y Gastos -->
             <section id="seccion-logistica-gastos" class="section-hidden fade-in">
-                <h2 class="mb-4"><i class="fas fa-truck text-primary me-2"></i>Logística y Gastos Operativos</h2>
+                <h2 class="mb-4"><i class="fas fa-truck me-2"></i>Logística y Gastos Operativos</h2>
                 
-                <!-- Tarjeta para registrar despacho -->
                 <div class="card">
                     <div class="card-header"><i class="fas fa-shipping-fast me-2"></i>Registrar Despacho / Envío</div>
                     <div class="card-body">
@@ -540,7 +752,6 @@
                     </div>
                 </div>
 
-                <!-- Tabla de despachos -->
                 <div class="card mt-3">
                     <div class="card-header"><i class="fas fa-list me-2"></i>Listado de Despachos</div>
                     <div class="card-body">
@@ -564,7 +775,6 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta para gastos -->
                 <div class="card mt-4">
                     <div class="card-header"><i class="fas fa-file-invoice-dollar me-2"></i>Registrar Gasto Operativo</div>
                     <div class="card-body">
@@ -597,7 +807,6 @@
                     </div>
                 </div>
 
-                <!-- Tabla de gastos -->
                 <div class="card mt-3">
                     <div class="card-header"><i class="fas fa-list me-2"></i>Registros de Gastos</div>
                     <div class="card-body">
@@ -661,14 +870,14 @@
             icon: 'error',
             title: 'Error',
             text: mensaje,
-            confirmButtonColor: '#6c5ce7'
+            confirmButtonColor: '#FFC107'
         });
     }
 
     function mostrarExito(mensaje) {
         Swal.fire({
             icon: 'success',
-            title: 'Éxito',
+            title: '¡Éxito!',
             text: mensaje,
             timer: 2000,
             showConfirmButton: false
@@ -681,8 +890,8 @@
             text: `Se eliminará ${nombre} (ID: ${id})`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#e17055',
-            cancelButtonColor: '#6c5ce7',
+            confirmButtonColor: '#f44336',
+            cancelButtonColor: '#FFC107',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
         });
@@ -1000,7 +1209,6 @@
     document.getElementById('form-producto-live').addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Obtener el último restock para asignar el detalle automáticamente
         const restocks = await fetchAPI('/restocks');
         const ultimoRestock = restocks[0];
         
@@ -1009,7 +1217,6 @@
             return;
         }
 
-        // Crear detalle de restock automáticamente
         const detalleData = {
             id_restock: ultimoRestock.id_restock,
             tipo_adquisicion: 'LOTE_SELECCIONADO',
@@ -1098,7 +1305,6 @@
             return;
         }
         
-        // Validar comprobante para tipos que lo requieren
         if (tipo_despacho === 'ENVIO_NACIONAL' || tipo_despacho === 'PUNTO_ENTREGA') {
             if (!fileInput.files[0] && !urlInput.value.trim()) {
                 mostrarError('Debe subir una foto o proporcionar un enlace del comprobante');
@@ -1106,7 +1312,6 @@
             }
         }
         
-        // Crear FormData para enviar archivo
         const formData = new FormData();
         formData.append('id_venta', id_venta);
         formData.append('tipo_despacho', tipo_despacho);
