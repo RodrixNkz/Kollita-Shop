@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Middlewares
 app.use(cors());
@@ -479,11 +479,19 @@ const publicPath = path.join(__dirname, 'public');
 if (fs.existsSync(publicPath)) {
   app.use(express.static(publicPath));
   console.log('📁 Sirviendo archivos estáticos desde /public');
+} else {
+  console.log('⚠️ No se encontró carpeta public');
 }
 
-// ================== RUTA PRINCIPAL ==================
-app.get('/', (req, res) => {
-  res.json({ message: 'API de Tienda de Ropa funcionando correctamente' });
+// ================== RUTA CATCH-ALL PARA FRONTEND ==================
+// Esta ruta debe estar DESPUÉS de todas las rutas /api
+app.get('*', (req, res) => {
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).json({ error: 'index.html no encontrado' });
+  }
 });
 
 // ================== INICIO DEL SERVIDOR ==================
