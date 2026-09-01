@@ -1,4 +1,4 @@
-// server.js - Versión completa actualizada
+// server.js - Versión completa corregida
 const express = require('express');
 const cors = require('cors');
 const Database = require('better-sqlite3');
@@ -55,7 +55,7 @@ try {
   }
   
   if (!schemaPath) {
-    console.error('❌ No se encontró ningún archivo SQL (buscando schema.sql, consultas.sql, etc.)');
+    console.error('❌ No se encontró ningún archivo SQL');
     process.exit(1);
   }
   
@@ -67,7 +67,7 @@ try {
   process.exit(1);
 }
 
-// ================== FUNCIONES AUXILIARES (better-sqlite3) ==================
+// ================== FUNCIONES AUXILIARES ==================
 function runQuery(sql, params = []) {
   try {
     const stmt = db.prepare(sql);
@@ -95,7 +95,12 @@ function allQuery(sql, params = []) {
   }
 }
 
-// ================== ENDPOINTS ==================
+// ================== ENDPOINTS DE API ==================
+
+// Ruta de prueba
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API funcionando correctamente' });
+});
 
 // ---------- RESTOCK SEMANAL ----------
 app.get('/api/restocks', (req, res) => {
@@ -108,7 +113,7 @@ app.get('/api/restocks', (req, res) => {
 app.post('/api/restocks', (req, res) => {
   const { fecha_compra, monto_total_invertido, origen_fondos, observaciones } = req.body;
   if (!fecha_compra || !monto_total_invertido || !origen_fondos) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios: fecha_compra, monto_total_invertido, origen_fondos' });
+    return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
   try {
     const result = runQuery(
@@ -295,7 +300,6 @@ app.post('/api/ventas', (req, res) => {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
 
-  // Validar que el producto exista y esté disponible
   try {
     const producto = getQuery('SELECT estado_disponibilidad FROM ProductosLive WHERE id_producto_live = ?', [id_producto_live]);
     if (!producto) {
@@ -344,16 +348,13 @@ app.post('/api/despachos', upload.single('comprobante'), (req, res) => {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
   
-  // Determinar el valor del comprobante (archivo subido o URL)
   let comprobante = null;
   if (req.file) {
-    // Si se subió archivo, guardamos la ruta relativa
     comprobante = `/uploads/${req.file.filename}`;
   } else if (comprobante_url && comprobante_url.trim() !== '') {
     comprobante = comprobante_url.trim();
   }
 
-  // Validar comprobante según tipo de despacho
   if (tipo_despacho === 'ENVIO_NACIONAL' || tipo_despacho === 'PUNTO_ENTREGA') {
     if (!comprobante) {
       return res.status(400).json({ error: `El comprobante es obligatorio para ${tipo_despacho === 'ENVIO_NACIONAL' ? 'envío nacional' : 'punto de entrega'}` });
@@ -370,27 +371,6 @@ app.post('/api/despachos', upload.single('comprobante'), (req, res) => {
     if (err.message.includes('UNIQUE')) {
       return res.status(409).json({ error: 'Ya existe un despacho para esta venta' });
     }
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Actualizar estado logístico (opcional)
-app.put('/api/despachos/:id', (req, res) => {
-  const { id } = req.params;
-  const { estado_logistico } = req.body;
-  if (!estado_logistico) {
-    return res.status(400).json({ error: 'estado_logistico es requerido' });
-  }
-  try {
-    const result = runQuery(
-      'UPDATE DespachoEnvio SET estado_logistico = ? WHERE id_despacho = ?',
-      [estado_logistico, id]
-    );
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Despacho no encontrado' });
-    }
-    res.json({ message: 'Estado actualizado correctamente' });
-  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -417,7 +397,7 @@ app.post('/api/gastos', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ---------- ELIMINACIÓN GENÉRICA (con manejo de FK) ----------
+// ---------- ELIMINACIÓN GENÉRICA ----------
 app.delete('/api/:tabla/:id', (req, res) => {
   const { tabla, id } = req.params;
   
@@ -464,17 +444,16 @@ app.delete('/api/:tabla/:id', (req, res) => {
     res.json({ message: 'Registro eliminado correctamente' });
   } catch (err) {
     console.error('Error al eliminar:', err);
-    // Si es un error de clave foránea, devolvemos un mensaje amigable
     if (err.message.includes('FOREIGN KEY constraint failed')) {
       return res.status(409).json({ 
-        error: 'No se puede eliminar este registro porque tiene datos relacionados en otras tablas. Elimina primero esos datos o desvincula las relaciones.' 
+        error: 'No se puede eliminar este registro porque tiene datos relacionados en otras tablas.' 
       });
     }
     res.status(500).json({ error: err.message });
   }
 });
 
-// ================== SERVIR FRONTEND ==================
+// ================== SERVIR FRONTEND (AL FINAL) ==================
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ================== INICIO DEL SERVIDOR ==================
