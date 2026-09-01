@@ -273,3 +273,14 @@ CREATE VIEW Vista_Balance_Diario AS
         0.0                              AS ingresos_live,
         ingreso_total_calculado         AS ingresos_feria
     FROM ProductosFeria;
+-- =====================================================================
+-- MÓDULO 6: VENTAS EN FERIA
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS VentasFeria (
+    id_venta_feria       INTEGER PRIMARY KEY AUTOINCREMENT,
+    fecha_feria          DATE NOT NULL,
+    descripcion_producto VARCHAR(150) NOT NULL,
+    cantidad             INTEGER NOT NULL CHECK (cantidad > 0),
+    precio_unitario      DECIMAL(10,2) NOT NULL CHECK (precio_unitario >= 0),
+    total                DECIMAL(10,2) GENERATED ALWAYS AS (cantidad * precio_unitario) STORED
+);
