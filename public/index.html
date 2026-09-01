@@ -522,29 +522,229 @@
         body.dark-mode .card.bg-primary small {
             color: #000 !important;
         }
-        
-        /* Asegurar que los badges de estado conserven sus colores en modo oscuro */
-body.dark-mode .status-badge.status-disponible {
-    background-color: #d4edda !important;
-    color: #155724 !important;
-}
 
-body.dark-mode .status-badge.status-reservado {
-    background-color: #fff3cd !important;
-    color: #856404 !important;
-}
+        body.dark-mode .status-badge.status-disponible {
+            background-color: #d4edda !important;
+            color: #155724 !important;
+        }
 
-body.dark-mode .status-badge.status-vendido {
-    background-color: #f8d7da !important;
-    color: #721c24 !important;
-}
+        body.dark-mode .status-badge.status-reservado {
+            background-color: #fff3cd !important;
+            color: #856404 !important;
+        }
+
+        body.dark-mode .status-badge.status-vendido {
+            background-color: #f8d7da !important;
+            color: #721c24 !important;
+        }
+
+        /* ========== RESPONSIVE PARA MÓVILES ========== */
+        .mobile-header {
+            display: none;
+        }
+
+        .sidebar-overlay {
+            display: none;
+        }
+
+        .btn-close-sidebar {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 80%;
+                max-width: 300px;
+                z-index: 9999;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+
+            .sidebar.active {
+                display: block !important;
+            }
+
+            .mobile-header {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 15px;
+                background: #1a1a1a;
+                color: white;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+
+            .mobile-header .logo-mobile {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: var(--amarillo);
+            }
+
+            .btn-menu {
+                background: var(--amarillo);
+                border: none;
+                color: #000;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 1.2rem;
+                cursor: pointer;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9998;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .btn-close-sidebar {
+                display: block !important;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: var(--amarillo);
+                border: none;
+                color: #000;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                z-index: 10000;
+            }
+
+            .main-content {
+                padding: 1rem !important;
+            }
+
+            .card {
+                margin-bottom: 1rem;
+            }
+
+            .card-header {
+                font-size: 0.85rem;
+                padding: 0.7rem 1rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .table thead th {
+                font-size: 0.7rem;
+                padding: 0.5rem;
+                white-space: nowrap;
+            }
+
+            .table tbody td {
+                font-size: 0.8rem;
+                padding: 0.5rem;
+                white-space: nowrap;
+            }
+
+            .form-label {
+                font-size: 0.85rem;
+            }
+
+            .form-control, .form-select {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.6rem;
+            }
+
+            .btn-primary {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+                width: 100%;
+            }
+
+            h2 {
+                font-size: 1.2rem !important;
+            }
+
+            .card.bg-success .card-body,
+            .card.bg-danger .card-body,
+            .card.bg-primary .card-body {
+                padding: 0.8rem;
+            }
+
+            .card.bg-success h3,
+            .card.bg-danger h3,
+            .card.bg-primary h3 {
+                font-size: 1.2rem;
+            }
+
+            .card.bg-success h5,
+            .card.bg-danger h5,
+            .card.bg-primary h5 {
+                font-size: 0.85rem;
+            }
+
+            .card.bg-success small,
+            .card.bg-danger small,
+            .card.bg-primary small {
+                font-size: 0.7rem;
+            }
+
+            .btn-action {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.7rem;
+            }
+
+            .search-box input {
+                font-size: 0.85rem;
+                padding: 0.4rem 1rem 0.4rem 2.2rem;
+            }
+
+            .comprobante-img {
+                width: 35px;
+                height: 35px;
+            }
+
+            .input-group-text {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.5rem;
+            }
+
+            .estado-logistico {
+                font-size: 0.75rem !important;
+                padding: 0.2rem !important;
+            }
+        }
     </style>
 </head>
 <body>
+<!-- Header para móvil -->
+<div class="mobile-header">
+    <span class="logo-mobile">Kollita Shop</span>
+    <button class="btn-menu" onclick="toggleSidebarMobile()">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+
+<!-- Overlay para sidebar móvil -->
+<div class="sidebar-overlay" onclick="toggleSidebarMobile()"></div>
+
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+        <nav class="col-md-3 col-lg-2 sidebar d-none d-md-block" id="sidebar">
+            <button class="btn-close-sidebar" onclick="toggleSidebarMobile()">
+                <i class="fas fa-times"></i>
+            </button>
+            
             <div class="logo-container">
                 <div class="logo-text">Kollita</div>
                 <div class="logo-subtext">Shop</div>
@@ -587,7 +787,7 @@ body.dark-mode .status-badge.status-vendido {
             <section id="seccion-panel-financiero" class="fade-in">
                 <h2 class="mb-4"><i class="fas fa-chart-pie"></i>Vista Financiera Unificada</h2>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <div class="card text-white bg-success">
                             <div class="card-body">
                                 <h5 class="card-title">Ingresos Totales</h5>
@@ -596,7 +796,7 @@ body.dark-mode .status-badge.status-vendido {
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <div class="card text-white bg-danger">
                             <div class="card-body">
                                 <h5 class="card-title">Egresos Totales</h5>
@@ -605,7 +805,7 @@ body.dark-mode .status-badge.status-vendido {
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 mb-3">
                         <div class="card text-white bg-primary">
                             <div class="card-body">
                                 <h5 class="card-title">Balance Neto</h5>
@@ -698,7 +898,7 @@ body.dark-mode .status-badge.status-vendido {
             <section id="seccion-catalogo-inventario" class="section-hidden fade-in">
                 <h2 class="mb-4"><i class="fas fa-tags"></i>Catálogo e Inventario</h2>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <div class="card">
                             <div class="card-header"><i class="fas fa-layer-group me-2"></i>Categorías y Marcas</div>
                             <div class="card-body">
@@ -729,7 +929,7 @@ body.dark-mode .status-badge.status-vendido {
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <div class="card">
                             <div class="card-header"><i class="fas fa-tshirt me-2"></i>Registrar Prenda Única</div>
                             <div class="card-body">
@@ -824,7 +1024,7 @@ body.dark-mode .status-badge.status-vendido {
             <section id="seccion-clientes-ventas" class="section-hidden fade-in">
                 <h2 class="mb-4"><i class="fas fa-users"></i>Clientes y Ventas Directas</h2>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <div class="card">
                             <div class="card-header"><i class="fas fa-user-plus me-2"></i>Registrar Cliente</div>
                             <div class="card-body">
@@ -850,7 +1050,7 @@ body.dark-mode .status-badge.status-vendido {
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-3">
                         <div class="card">
                             <div class="card-header"><i class="fas fa-shopping-cart me-2"></i>Nueva Venta</div>
                             <div class="card-body">
@@ -1138,6 +1338,37 @@ body.dark-mode .status-badge.status-vendido {
         }
     }
 
+    // ========== MENÚ MÓVIL ==========
+    function toggleSidebarMobile() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Cerrar sidebar al hacer clic en un link (móvil)
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (e.target.closest('.sidebar .nav-link')) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+    });
+
+    // Cerrar sidebar al redimensionar
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+    });
+
     // ========== FUNCIONES DE API ==========
     async function fetchAPI(endpoint, method = 'GET', body = null) {
         const options = {
@@ -1220,7 +1451,6 @@ body.dark-mode .status-badge.status-vendido {
     // ========== CARGAR DATOS ==========
     async function cargarDatos() {
         try {
-            // Categorías
             const categorias = await fetchAPI('/categorias');
             const selectCategoria = document.getElementById('pl-categoria');
             selectCategoria.innerHTML = '<option value="">Seleccione...</option>';
@@ -1228,7 +1458,6 @@ body.dark-mode .status-badge.status-vendido {
                 selectCategoria.innerHTML += `<option value="${cat.id_categoria}">${cat.nombre_categoria}</option>`;
             });
 
-            // Marcas
             const marcas = await fetchAPI('/marcas');
             const selectMarca = document.getElementById('pl-marca');
             selectMarca.innerHTML = '<option value="">Seleccione...</option>';
@@ -1236,7 +1465,6 @@ body.dark-mode .status-badge.status-vendido {
                 selectMarca.innerHTML += `<option value="${mar.id_marca}">${mar.nombre_marca}</option>`;
             });
 
-            // Clientes
             const clientes = await fetchAPI('/clientes');
             const selectCliente = document.getElementById('venta-cliente');
             selectCliente.innerHTML = '<option value="">Seleccione...</option>';
@@ -1244,7 +1472,6 @@ body.dark-mode .status-badge.status-vendido {
                 selectCliente.innerHTML += `<option value="${cli.id_cliente}">${cli.nombre_completo} (${cli.telefono_whatsapp})</option>`;
             });
 
-            // Productos disponibles para venta
             const productos = await fetchAPI('/productos-live');
             const selectProducto = document.getElementById('venta-producto');
             selectProducto.innerHTML = '<option value="">Seleccione una prenda disponible...</option>';
@@ -1252,7 +1479,6 @@ body.dark-mode .status-badge.status-vendido {
                 selectProducto.innerHTML += `<option value="${prod.id_producto_live}">${prod.nombre_descripcion} - ${prod.nombre_marca} (${prod.talla || 'Sin talla'}) - ${formatearPrecio(prod.umbral_precio_min)}</option>`;
             });
 
-            // Ventas para despacho
             const ventas = await fetchAPI('/ventas');
             const selectVentaDespacho = document.getElementById('despacho-id-venta');
             selectVentaDespacho.innerHTML = '<option value="">Seleccione una venta...</option>';
@@ -1260,7 +1486,6 @@ body.dark-mode .status-badge.status-vendido {
                 selectVentaDespacho.innerHTML += `<option value="${v.id_venta}">#${v.id_venta} - ${v.cliente_nombre} (${v.estado_venta})</option>`;
             });
 
-            // Cargar listas y tablas
             cargarListaCategorias();
             cargarListaMarcas();
             cargarRestocks();
@@ -1478,7 +1703,6 @@ body.dark-mode .status-badge.status-vendido {
                     </tr>`;
             });
 
-            // Agregar evento change a los selects de estado
             document.querySelectorAll('.estado-logistico').forEach(sel => {
                 sel.addEventListener('change', async (e) => {
                     const id = e.target.dataset.id;
@@ -1488,7 +1712,7 @@ body.dark-mode .status-badge.status-vendido {
                         mostrarExito('Estado actualizado');
                     } catch (error) {
                         mostrarError(error.message);
-                        cargarDatos(); // recargar para revertir el cambio
+                        cargarDatos();
                     }
                 });
             });
