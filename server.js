@@ -475,29 +475,7 @@ app.delete('/api/:tabla/:id', (req, res) => {
 });
 
 // ================== SERVIR FRONTEND ==================
-const publicPath = path.join(__dirname, 'public');
-if (fs.existsSync(publicPath)) {
-    app.use(express.static(publicPath));
-    console.log('📁 Sirviendo frontend desde /public');
-} else {
-    console.log('⚠️ No se encontró carpeta public');
-}
-
-// Middleware para manejar rutas no-API
-app.use((req, res, next) => {
-    // Si es una ruta de API que no existe, devolver JSON
-    if (req.path.startsWith('/api')) {
-        return res.status(404).json({ error: 'Endpoint no encontrado' });
-    }
-    
-    // Si es una ruta del frontend, servir index.html
-    const indexPath = path.join(__dirname, 'public', 'index.html');
-    if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-    } else {
-        res.status(404).json({ error: 'index.html no encontrado' });
-    }
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ================== INICIO DEL SERVIDOR ==================
 app.listen(PORT, () => {
