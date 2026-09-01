@@ -14,11 +14,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configuración de Multer
+// Configuración de Multer para subir archivos
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
     cb(null, dir);
   },
   filename: function (req, file, cb) {
@@ -28,17 +30,21 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Servir archivos estáticos de la carpeta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ================== CONEXIÓN A LA BASE DE DATOS ==================
 const DB_PATH = path.join(__dirname, 'tienda.db');
 const db = new Database(DB_PATH);
+
+// Habilitar foreign keys
 db.pragma('foreign_keys = ON');
 
 // ================== CARGA DEL ESQUEMA SQL ==================
 try {
   const possibleSchemaNames = ['schema.sql', 'consultas.sql', 'database.sql', 'db.sql'];
   let schemaPath = null;
+
   for (const name of possibleSchemaNames) {
     const fullPath = path.join(__dirname, name);
     if (fs.existsSync(fullPath)) {
@@ -47,10 +53,12 @@ try {
       break;
     }
   }
+
   if (!schemaPath) {
-    console.error('❌ No se encontró ningún archivo SQL');
+    console.error('❌ No se encontró ningún archivo SQL (buscando schema.sql, consultas.sql, etc.)');
     process.exit(1);
   }
+
   const schemaSQL = fs.readFileSync(schemaPath, 'utf8');
   db.exec(schemaSQL);
   console.log('✅ Esquema SQL cargado correctamente');
@@ -76,19 +84,27 @@ function runQuery(sql, params = []) {
   try {
     const stmt = db.prepare(sql);
     return stmt.run(...params);
-  } catch (err) { throw err; }
+  } catch (err) {
+    throw err;
+  }
 }
+
 function getQuery(sql, params = []) {
   try {
     const stmt = db.prepare(sql);
     return stmt.get(...params);
-  } catch (err) { throw err; }
+  } catch (err) {
+    throw err;
+  }
 }
+
 function allQuery(sql, params = []) {
   try {
     const stmt = db.prepare(sql);
     return stmt.all(...params);
-  } catch (err) { throw err; }
+  } catch (err) {
+    throw err;
+  }
 }
 
 // ================== ENDPOINTS ==================
@@ -104,7 +120,7 @@ app.get('/api/restocks', (req, res) => {
 app.post('/api/restocks', (req, res) => {
   const { fecha_compra, monto_total_invertido, origen_fondos, observaciones } = req.body;
   if (!fecha_compra || !monto_total_invertido || !origen_fondos) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    return res.status(400).json({ error: 'Faltan campos obligatorios: fecha_compra, monto_total_invertido, origen_fondos' });
   }
   try {
     const result = runQuery(
@@ -115,7 +131,7 @@ app.post('/api/restocks', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// NUEVO: Actualizar restock
+// Actualizar restock
 app.put('/api/restocks/:id', (req, res) => {
   const { id } = req.params;
   const { fecha_compra, monto_total_invertido, origen_fondos, observaciones } = req.body;
@@ -169,7 +185,9 @@ app.post('/api/categorias', (req, res) => {
     const result = runQuery('INSERT INTO Categoria (nombre_categoria) VALUES (?)', [nombre_categoria]);
     res.status(201).json({ id_categoria: result.lastInsertRowid, nombre_categoria });
   } catch (err) {
-    if (err.message.includes('UNIQUE')) return res.status(409).json({ error: 'Ya existe esa categoría' });
+    if (err.message.includes('UNIQUE')) {
+      return res.status(409).json({ error: 'Ya existe una categoría con ese nombre' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -189,7 +207,9 @@ app.post('/api/marcas', (req, res) => {
     const result = runQuery('INSERT INTO Marca (nombre_marca) VALUES (?)', [nombre_marca]);
     res.status(201).json({ id_marca: result.lastInsertRowid, nombre_marca });
   } catch (err) {
-    if (err.message.includes('UNIQUE')) return res.status(409).json({ error: 'Ya existe esa marca' });
+    if (err.message.includes('UNIQUE')) {
+      return res.status(409).json({ error: 'Ya existe una marca con ese nombre' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -232,7 +252,7 @@ app.post('/api/productos-live', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ---------- PRODUCTOS FERIA (inventario) ----------
+// ---------- PRODUCTOS FERIA ----------
 app.get('/api/productos-feria', (req, res) => {
   try {
     const productos = allQuery('SELECT * FROM ProductosFeria ORDER BY fecha_feria DESC');
@@ -254,7 +274,7 @@ app.post('/api/productos-feria', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ---------- VENTAS FERIA (nuevo) ----------
+// ---------- VENTAS FERIA ----------
 app.get('/api/ventas-feria', (req, res) => {
   try {
     const ventas = allQuery('SELECT * FROM VentasFeria ORDER BY fecha_feria DESC');
@@ -296,12 +316,14 @@ app.post('/api/clientes', (req, res) => {
     );
     res.status(201).json({ id_cliente: result.lastInsertRowid, ...req.body });
   } catch (err) {
-    if (err.message.includes('UNIQUE')) return res.status(409).json({ error: 'El teléfono ya está registrado' });
+    if (err.message.includes('UNIQUE')) {
+      return res.status(409).json({ error: 'El teléfono de WhatsApp ya está registrado' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
 
-// ---------- VENTAS (Live/WhatsApp) ----------
+// ---------- VENTAS ----------
 app.get('/api/ventas', (req, res) => {
   try {
     const ventas = allQuery(`
@@ -323,10 +345,15 @@ app.post('/api/ventas', (req, res) => {
   if (!id_cliente || !canal_venta || !estado_venta || !id_producto_live || !precio_venta_real) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
+
   try {
     const producto = getQuery('SELECT estado_disponibilidad FROM ProductosLive WHERE id_producto_live = ?', [id_producto_live]);
-    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
-    if (producto.estado_disponibilidad !== 'DISPONIBLE') return res.status(409).json({ error: 'Producto no disponible' });
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    if (producto.estado_disponibilidad !== 'DISPONIBLE') {
+      return res.status(409).json({ error: `El producto no está disponible (estado: ${producto.estado_disponibilidad})` });
+    }
 
     const transaction = db.transaction(() => {
       const resultVenta = runQuery(
@@ -334,16 +361,20 @@ app.post('/api/ventas', (req, res) => {
         [id_cliente, canal_venta, estado_venta, precio_venta_real]
       );
       const id_venta = resultVenta.lastInsertRowid;
+
       runQuery(
         'INSERT INTO DetalleVentaLive (id_venta, id_producto_live, precio_venta_real) VALUES (?, ?, ?)',
         [id_venta, id_producto_live, precio_venta_real]
       );
       return id_venta;
     });
+
     const id_venta = transaction();
     res.status(201).json({ id_venta, message: 'Venta registrada correctamente' });
   } catch (err) {
-    if (err.message.includes('UNIQUE')) return res.status(409).json({ error: 'El producto ya está en otra venta' });
+    if (err.message.includes('UNIQUE')) {
+      return res.status(409).json({ error: 'El producto ya está en otra venta' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
@@ -358,16 +389,24 @@ app.get('/api/despachos', (req, res) => {
 
 app.post('/api/despachos', upload.single('comprobante'), (req, res) => {
   const { id_venta, tipo_despacho, direccion_o_lugar, costo_envio, estado_logistico, comprobante_url } = req.body;
+  
   if (!id_venta || !tipo_despacho || !direccion_o_lugar || !costo_envio) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
+  
   let comprobante = null;
-  if (req.file) comprobante = `/uploads/${req.file.filename}`;
-  else if (comprobante_url && comprobante_url.trim() !== '') comprobante = comprobante_url.trim();
+  if (req.file) {
+    comprobante = `/uploads/${req.file.filename}`;
+  } else if (comprobante_url && comprobante_url.trim() !== '') {
+    comprobante = comprobante_url.trim();
+  }
 
   if (tipo_despacho === 'ENVIO_NACIONAL' || tipo_despacho === 'PUNTO_ENTREGA') {
-    if (!comprobante) return res.status(400).json({ error: 'Comprobante obligatorio' });
+    if (!comprobante) {
+      return res.status(400).json({ error: `El comprobante es obligatorio para ${tipo_despacho === 'ENVIO_NACIONAL' ? 'envío nacional' : 'punto de entrega'}` });
+    }
   }
+
   try {
     const result = runQuery(
       'INSERT INTO DespachoEnvio (id_venta, tipo_despacho, direccion_o_lugar, costo_envio, comprobante_respaldo, estado_logistico) VALUES (?, ?, ?, ?, ?, ?)',
@@ -375,24 +414,32 @@ app.post('/api/despachos', upload.single('comprobante'), (req, res) => {
     );
     res.status(201).json({ id_despacho: result.lastInsertRowid, ...req.body, comprobante_respaldo: comprobante });
   } catch (err) {
-    if (err.message.includes('UNIQUE')) return res.status(409).json({ error: 'Ya existe despacho para esa venta' });
+    if (err.message.includes('UNIQUE')) {
+      return res.status(409).json({ error: 'Ya existe un despacho para esta venta' });
+    }
     res.status(500).json({ error: err.message });
   }
 });
 
-// NUEVO: Actualizar estado logístico
+// Actualizar estado logístico
 app.put('/api/despachos/:id', (req, res) => {
   const { id } = req.params;
   const { estado_logistico } = req.body;
-  if (!estado_logistico) return res.status(400).json({ error: 'estado_logistico es requerido' });
+  if (!estado_logistico) {
+    return res.status(400).json({ error: 'estado_logistico es requerido' });
+  }
   try {
     const result = runQuery(
       'UPDATE DespachoEnvio SET estado_logistico = ? WHERE id_despacho = ?',
       [estado_logistico, id]
     );
-    if (result.changes === 0) return res.status(404).json({ error: 'Despacho no encontrado' });
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Despacho no encontrado' });
+    }
     res.json({ message: 'Estado actualizado correctamente' });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ---------- GASTOS OPERATIVOS ----------
@@ -417,9 +464,10 @@ app.post('/api/gastos', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ---------- ELIMINACIÓN GENÉRICA ----------
+// ---------- ELIMINACIÓN GENÉRICA (con manejo de FK y cascada para restocks) ----------
 app.delete('/api/:tabla/:id', (req, res) => {
   const { tabla, id } = req.params;
+  
   const tablasPermitidas = {
     'restocks': 'RestockSemanal',
     'detalles-restock': 'DetalleRestock',
@@ -434,7 +482,11 @@ app.delete('/api/:tabla/:id', (req, res) => {
     'gastos': 'GastoOperativo',
     'ventas-feria': 'VentasFeria'
   };
-  if (!tablasPermitidas[tabla]) return res.status(400).json({ error: 'Tabla no válida' });
+  
+  if (!tablasPermitidas[tabla]) {
+    return res.status(400).json({ error: 'Tabla no válida' });
+  }
+  
   const nombreTabla = tablasPermitidas[tabla];
   const columnasId = {
     'RestockSemanal': 'id_restock',
@@ -450,15 +502,42 @@ app.delete('/api/:tabla/:id', (req, res) => {
     'GastoOperativo': 'id_gasto',
     'VentasFeria': 'id_venta_feria'
   };
+  
   const columnaId = columnasId[nombreTabla];
+  
   try {
+    // Si es un restock, eliminar primero sus detalles y productos asociados
+    if (nombreTabla === 'RestockSemanal') {
+      const transaction = db.transaction(() => {
+        // Eliminar productos live que dependen de los detalles
+        runQuery(`DELETE FROM ProductosLive WHERE id_detalle_restock IN (SELECT id_detalle_restock FROM DetalleRestock WHERE id_restock = ?)`, [id]);
+        // Eliminar productos feria que dependen de los detalles
+        runQuery(`DELETE FROM ProductosFeria WHERE id_detalle_restock IN (SELECT id_detalle_restock FROM DetalleRestock WHERE id_restock = ?)`, [id]);
+        // Eliminar detalles de restock
+        runQuery(`DELETE FROM DetalleRestock WHERE id_restock = ?`, [id]);
+        // Finalmente eliminar el restock
+        const result = runQuery(`DELETE FROM RestockSemanal WHERE id_restock = ?`, [id]);
+        return result;
+      });
+      const result = transaction();
+      if (result.changes === 0) {
+        return res.status(404).json({ error: 'Restock no encontrado' });
+      }
+      return res.json({ message: 'Restock y sus dependencias eliminados correctamente' });
+    }
+    
+    // Para las demás tablas, eliminación directa
     const result = runQuery(`DELETE FROM ${nombreTabla} WHERE ${columnaId} = ?`, [id]);
-    if (result.changes === 0) return res.status(404).json({ error: 'Registro no encontrado' });
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Registro no encontrado' });
+    }
     res.json({ message: 'Registro eliminado correctamente' });
   } catch (err) {
     console.error('Error al eliminar:', err);
     if (err.message.includes('FOREIGN KEY constraint failed')) {
-      return res.status(409).json({ error: 'No se puede eliminar porque tiene registros relacionados. Elimine primero los registros dependientes.' });
+      return res.status(409).json({ 
+        error: 'No se puede eliminar porque tiene registros relacionados. Elimine primero los registros dependientes.' 
+      });
     }
     res.status(500).json({ error: err.message });
   }
@@ -467,6 +546,7 @@ app.delete('/api/:tabla/:id', (req, res) => {
 // ================== SERVIR FRONTEND ==================
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ================== INICIO DEL SERVIDOR ==================
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   console.log(`📊 Base de datos: ${DB_PATH}`);
