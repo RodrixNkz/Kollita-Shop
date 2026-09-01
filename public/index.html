@@ -32,10 +32,11 @@
         }
 
         body { 
-            background: #fafafa; 
+            background: #fafafa;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* Sidebar limpio */
+        /* ========== SIDEBAR ========== */
         .sidebar {
             min-height: 100vh;
             background: #1a1a1a;
@@ -45,7 +46,6 @@
             top: 0;
         }
 
-        /* Logo simple */
         .logo-container {
             text-align: center;
             margin-bottom: 2rem;
@@ -92,12 +92,73 @@
             font-weight: 600;
         }
 
+        /* Toggle modo oscuro */
+        .dark-mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.65);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .dark-mode-toggle:hover {
+            color: #fff;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 45px;
+            height: 24px;
+            background: #444;
+            border-radius: 12px;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .toggle-switch {
+            background: var(--amarillo);
+        }
+
+        body.dark-mode .toggle-switch::after {
+            transform: translateX(21px);
+            background: #000;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-label i {
+            font-size: 1rem;
+        }
+
+        /* ========== MAIN CONTENT ========== */
         .main-content {
             padding: 2rem;
             max-width: 1400px;
         }
 
-        /* Tarjetas limpias */
         .card {
             border: 1px solid #e0e0e0;
             border-radius: 10px;
@@ -121,7 +182,6 @@
             font-size: 0.95rem;
         }
 
-        /* Botones */
         .btn-primary {
             background: var(--amarillo);
             border: none;
@@ -151,7 +211,6 @@
             box-shadow: 0 0 0 3px rgba(255,193,7,0.15);
         }
 
-        /* Tablas */
         .table {
             margin-bottom: 0;
         }
@@ -178,7 +237,6 @@
             background: #fffef5;
         }
 
-        /* Badges */
         .status-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -201,7 +259,6 @@
             color: #721c24;
         }
 
-        /* Botones de acción */
         .btn-action {
             padding: 0.25rem 0.5rem;
             font-size: 0.8rem;
@@ -219,7 +276,6 @@
             background: #f8d7da; 
         }
 
-        /* Títulos */
         h2 {
             font-weight: 700;
             color: #1a1a1a;
@@ -232,7 +288,6 @@
             margin-right: 10px;
         }
 
-        /* Tarjetas de estadísticas */
         .card.bg-success {
             background: #28a745 !important;
             border: none;
@@ -255,7 +310,6 @@
             color: #000 !important;
         }
 
-        /* Búsqueda */
         .search-box {
             position: relative;
             margin-bottom: 1rem;
@@ -291,6 +345,108 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* ========== MODO OSCURO ========== */
+        body.dark-mode {
+            background: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .card {
+            background: #1e1e1e;
+            border-color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode .card-header {
+            background: #000;
+            color: var(--amarillo);
+            border-bottom: 1px solid #333;
+        }
+
+        body.dark-mode .table thead th {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            border-bottom: 2px solid var(--amarillo);
+        }
+
+        body.dark-mode .table tbody td {
+            border-bottom: 1px solid #333;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .table tbody tr:hover {
+            background: #2d2d2d;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #2d2d2d;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background: #333;
+            border-color: var(--amarillo);
+            box-shadow: 0 0 0 3px rgba(255,193,7,0.2);
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: #888;
+        }
+
+        body.dark-mode h2 {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .list-group-item {
+            background: #1e1e1e;
+            border-color: #333;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .search-box input {
+            background: #2d2d2d;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .search-box input::placeholder {
+            color: #888;
+        }
+
+        body.dark-mode .text-muted {
+            color: #999 !important;
+        }
+
+        body.dark-mode .input-group-text {
+            background: #2d2d2d;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .comprobante-img {
+            border-color: #444;
+        }
+
+        body.dark-mode .btn-action {
+            background: transparent;
+        }
+
+        body.dark-mode .card.bg-success {
+            background: #1a7a32 !important;
+        }
+
+        body.dark-mode .card.bg-danger {
+            background: #b32d3a !important;
+        }
+
+        body.dark-mode .card.bg-primary {
+            background: #b38a00 !important;
+        }
     </style>
 </head>
 <body>
@@ -320,6 +476,15 @@
                     <a class="nav-link" data-section="logistica-gastos"><i class="fas fa-truck me-2"></i>Logística y Gastos</a>
                 </li>
             </ul>
+
+            <!-- Toggle modo oscuro -->
+            <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+                <span class="toggle-label">
+                    <i class="fas fa-moon" id="dark-mode-icon"></i>
+                    <span>Modo Oscuro</span>
+                </span>
+                <div class="toggle-switch"></div>
+            </div>
         </nav>
 
         <!-- Main Content -->
@@ -799,6 +964,31 @@
 <script>
     // ========== CONFIGURACIÓN ==========
     const API_URL = window.location.origin + '/api';
+
+    // ========== MODO OSCURO ==========
+    function toggleDarkMode() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        
+        const isDark = body.classList.contains('dark-mode');
+        localStorage.setItem('dark-mode', isDark ? 'true' : 'false');
+        
+        const icon = document.getElementById('dark-mode-icon');
+        if (icon) {
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+
+    function cargarPreferenciaDarkMode() {
+        const saved = localStorage.getItem('dark-mode');
+        if (saved === 'true') {
+            document.body.classList.add('dark-mode');
+            const icon = document.getElementById('dark-mode-icon');
+            if (icon) {
+                icon.className = 'fas fa-sun';
+            }
+        }
+    }
 
     // ========== FUNCIONES DE API ==========
     async function fetchAPI(endpoint, method = 'GET', body = null) {
@@ -1336,6 +1526,7 @@
     });
 
     // ========== INICIAR ==========
+    cargarPreferenciaDarkMode();
     cargarDatos();
 </script>
 </body>
